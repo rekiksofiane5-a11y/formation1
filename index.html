@@ -37,6 +37,23 @@ window.escaleTag = function (n, d) { (window.__tagsEnAttente = window.__tagsEnAt
 })();
 
 // Contexte de page, disponible dès le premier événement.
+// Consent Mode v2 — restauré depuis la session, AVANT le chargement de GTM.
+function gtag() { dataLayer.push(arguments); }
+window.__consentInitial = { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' };
+try {
+  var sauvegarde = sessionStorage.getItem('escale_consent');
+  if (sauvegarde) window.__consentInitial = JSON.parse(sauvegarde);
+} catch (e) {}
+gtag('consent', 'default', {
+  ad_storage: window.__consentInitial.ad_storage,
+  ad_user_data: window.__consentInitial.ad_user_data,
+  ad_personalization: window.__consentInitial.ad_personalization,
+  analytics_storage: window.__consentInitial.analytics_storage,
+  functionality_storage: 'granted',
+  security_storage: 'granted',
+  wait_for_update: 500
+});
+
 dataLayer.push({
   page_type: 'accueil',
   page_nom: 'Accueil',
@@ -58,6 +75,17 @@ dataLayer.push({
     <span class="etat" id="etat-gtm">en attente</span>
     <div class="compteur"><b id="compteur">0</b> événements</div>
     <p class="diag" id="diagnostic"></p>
+  </div>
+  <div class="consent">
+    <div class="consent-inner">
+      <span class="titre">Consent Mode v2</span>
+      <button class="pastille" data-consent="ad_storage" data-etat="denied">ad_storage : denied</button>
+      <button class="pastille" data-consent="ad_user_data" data-etat="denied">ad_user_data : denied</button>
+      <button class="pastille" data-consent="ad_personalization" data-etat="denied">ad_personalization : denied</button>
+      <button class="pastille" data-consent="analytics_storage" data-etat="denied">analytics_storage : denied</button>
+      <button class="btn-fant" id="btn-tout-accepter">Tout accepter</button>
+      <button class="btn-fant" id="btn-tout-refuser">Tout refuser</button>
+    </div>
   </div>
 </header>
 
@@ -109,7 +137,7 @@ dataLayer.push({
 <aside class="dock" id="dock" aria-label="Journal">
   <div class="dock-tete">
     <button data-panneau="flux" aria-selected="true">dataLayer</button>
-    <button data-panneau="balises" aria-selected="false">Balises (<span id="compteur-balises">0</span>)</button>
+    <button data-panneau="hits" aria-selected="false">Hits &amp; balises (<span id="compteur-hits">0</span>)</button>
   </div>
   <div class="dock-outils">
     <input type="search" id="filtre" placeholder="filtrer…" aria-label="Filtrer">
@@ -118,7 +146,7 @@ dataLayer.push({
     <button class="mini-lien" id="btn-effacer">effacer</button>
   </div>
   <div class="panneau" id="flux" data-actif="1"><p class="panneau-vide">En attente du premier push…</p></div>
-  <div class="panneau" id="balises"><p class="panneau-vide">Aucune balise déclenchée.<br><br>Créez une balise <b>HTML personnalisé</b> dans GTM :<br><code>&lt;script&gt;escaleTag('Nom', {ville: {{DL - ville}}});&lt;/script&gt;</code><br><br>Elle s'affichera ici avec les valeurs résolues.</p></div>
+  <div class="panneau" id="hits"><p class="panneau-vide">Aucun hit sortant pour l'instant.<br><br>Les événements GA4, Google Ads et Meta envoyés par vos balises s'afficheront ici automatiquement, avec leurs paramètres.<br><br>Une balise <b>HTML personnalisé</b> appelant <code>escaleTag('Nom', {…})</code> s'y affiche aussi.</p></div>
 </aside>
 
 <script src="escale.js"></script>
