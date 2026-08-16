@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escale — accueil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="escale.css">
+
+<!-- dataLayer + moniteur : AVANT tout le reste -->
+<script>
+window.dataLayer = window.dataLayer || [];
+window.__journal = [];
+window.__tampon = [];
+window.__journaliser = function (m) { window.__tampon.push(m); };
+window.escaleTag = function (n, d) { (window.__tagsEnAttente = window.__tagsEnAttente || []).push([n, d]); };
+
+(function () {
+  function installerHook() {
+    var dl = window.dataLayer;
+    if (!dl || (dl.push && dl.push.__hooke)) return;
+    var origine = dl.push;
+    var wrapper = function () {
+      for (var i = 0; i < arguments.length; i++) {
+        try { window.__journaliser(arguments[i]); } catch (e) {}
+      }
+      return origine.apply(dl, arguments);
+    };
+    wrapper.__hooke = true;
+    dl.push = wrapper;
+  }
+  window.__installerHook = installerHook;
+  installerHook();
+  setInterval(installerHook, 400);
+})();
+
+// Contexte de page, disponible dès le premier événement.
+dataLayer.push({
+  page_type: 'accueil',
+  page_nom: 'Accueil',
+  environnement: 'formation',
+  langue: 'fr'
+});
+</script>
+</head>
+<body data-page="accueil">
+
+<header class="barre">
+  <div class="barre-inner">
+    <div class="marque">escale<span>.</span></div>
+    <div class="champ">
+      <label for="id-conteneur">Conteneur</label>
+      <input type="text" id="id-conteneur" value="GTM-PGXXKF5F" placeholder="GTM-XXXXXXX" spellcheck="false" autocomplete="off">
+    </div>
+    <button class="btn" id="btn-charger">Charger</button>
+    <span class="etat" id="etat-gtm">en attente</span>
+    <div class="compteur"><b id="compteur">0</b> événements</div>
+    <p class="diag" id="diagnostic"></p>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" aria-current="page">Accueil</a>
+    <a href="destinations.html">Destinations</a>
+    <a href="merci.html">Confirmation</a>
+    <span class="chemin">page_type <b>accueil</b></span>
+  </div>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <span class="eyebrow">Page 1 sur 3</span>
+    <h1>Escale,<br>agence de voyages.</h1>
+    <p class="chapo">Trois pages, trois chemins d'URL. Chaque bouton pousse son identifiant dans le dataLayer ; chaque destination pousse sa ville, sa durée et son montant.</p>
+    <div class="actions">
+      <a class="btn-clair" href="destinations.html" id="lien-destinations" data-bouton-id="voir-destinations" data-bouton-zone="hero">Voir les destinations</a>
+      <button class="btn-bord" id="btn-devis" data-bouton-id="demander-devis" data-bouton-zone="hero">Demander un devis</button>
+      <button class="btn-bord" id="btn-rappel" data-bouton-id="etre-rappele" data-bouton-zone="hero">Être rappelé</button>
+    </div>
+  </section>
+
+  <section id="villes">
+    <span class="eyebrow">Choix de la ville</span>
+    <h2>Où partez-vous ?</h2>
+    <p class="chapo">Un clic pousse la ville choisie, puis ouvre la page Destinations.</p>
+    <div class="actions" id="liste-villes"></div>
+    <p class="msg" id="msg-ville" hidden></p>
+  </section>
+
+  <section id="cles">
+    <span class="eyebrow">Aide-mémoire</span>
+    <h2>Ce que cette page pousse</h2>
+    <table class="cles">
+      <tr><th>Événement</th><th>Clés disponibles</th><th>Déclenché par</th></tr>
+      <tr><td>—</td><td>page_type, page_nom, environnement, langue</td><td>chargement de la page</td></tr>
+      <tr><td>clic_bouton</td><td>bouton_id, bouton_libelle, bouton_zone</td><td>les trois boutons du haut</td></tr>
+      <tr><td>choix_ville</td><td>ville, pays, ville_code, prix_jour</td><td>les boutons de ville</td></tr>
+    </table>
+  </section>
+
+</main>
+
+<button class="dock-bascule" id="dock-bascule" aria-expanded="false">Journal (<span id="compteur-mobile">0</span>)</button>
+
+<aside class="dock" id="dock" aria-label="Journal">
+  <div class="dock-tete">
+    <button data-panneau="flux" aria-selected="true">dataLayer</button>
+    <button data-panneau="balises" aria-selected="false">Balises (<span id="compteur-balises">0</span>)</button>
+  </div>
+  <div class="dock-outils">
+    <input type="search" id="filtre" placeholder="filtrer…" aria-label="Filtrer">
+    <label class="bascule"><input type="checkbox" id="masquer-gtm"> masquer gtm.*</label>
+    <button class="mini-lien" id="btn-copier">copier</button>
+    <button class="mini-lien" id="btn-effacer">effacer</button>
+  </div>
+  <div class="panneau" id="flux" data-actif="1"><p class="panneau-vide">En attente du premier push…</p></div>
+  <div class="panneau" id="balises"><p class="panneau-vide">Aucune balise déclenchée.<br><br>Créez une balise <b>HTML personnalisé</b> dans GTM :<br><code>&lt;script&gt;escaleTag('Nom', {ville: {{DL - ville}}});&lt;/script&gt;</code><br><br>Elle s'affichera ici avec les valeurs résolues.</p></div>
+</aside>
+
+<script src="escale.js"></script>
+</body>
+</html>

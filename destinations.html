@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escale — destinations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="escale.css">
+
+<!-- dataLayer + moniteur : AVANT tout le reste -->
+<script>
+window.dataLayer = window.dataLayer || [];
+window.__journal = [];
+window.__tampon = [];
+window.__journaliser = function (m) { window.__tampon.push(m); };
+window.escaleTag = function (n, d) { (window.__tagsEnAttente = window.__tagsEnAttente || []).push([n, d]); };
+
+(function () {
+  function installerHook() {
+    var dl = window.dataLayer;
+    if (!dl || (dl.push && dl.push.__hooke)) return;
+    var origine = dl.push;
+    var wrapper = function () {
+      for (var i = 0; i < arguments.length; i++) {
+        try { window.__journaliser(arguments[i]); } catch (e) {}
+      }
+      return origine.apply(dl, arguments);
+    };
+    wrapper.__hooke = true;
+    dl.push = wrapper;
+  }
+  window.__installerHook = installerHook;
+  installerHook();
+  setInterval(installerHook, 400);
+})();
+
+dataLayer.push({
+  page_type: 'destinations',
+  page_nom: 'Liste des destinations',
+  environnement: 'formation',
+  langue: 'fr'
+});
+</script>
+</head>
+<body data-page="destinations">
+
+<header class="barre">
+  <div class="barre-inner">
+    <div class="marque">escale<span>.</span></div>
+    <div class="champ">
+      <label for="id-conteneur">Conteneur</label>
+      <input type="text" id="id-conteneur" value="GTM-PGXXKF5F" placeholder="GTM-XXXXXXX" spellcheck="false" autocomplete="off">
+    </div>
+    <button class="btn" id="btn-charger">Charger</button>
+    <span class="etat" id="etat-gtm">en attente</span>
+    <div class="compteur"><b id="compteur">0</b> événements</div>
+    <p class="diag" id="diagnostic"></p>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html">Accueil</a>
+    <a href="destinations.html" aria-current="page">Destinations</a>
+    <a href="merci.html">Confirmation</a>
+    <span class="chemin">page_type <b>destinations</b></span>
+  </div>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <span class="eyebrow">Page 2 sur 3</span>
+    <h1>Nos escales</h1>
+    <p class="chapo">Choisissez une durée : le montant se recalcule et part dans le dataLayer. « Réserver » ouvre la page de confirmation.</p>
+  </section>
+
+  <section id="offres">
+    <div class="villes" id="liste-offres"></div>
+    <p class="msg" id="msg-reservation" hidden></p>
+  </section>
+
+  <section id="cles">
+    <span class="eyebrow">Aide-mémoire</span>
+    <h2>Ce que cette page pousse</h2>
+    <table class="cles">
+      <tr><th>Événement</th><th>Clés disponibles</th><th>Déclenché par</th></tr>
+      <tr><td>—</td><td>page_type, page_nom, environnement, langue</td><td>chargement de la page</td></tr>
+      <tr><td>choix_duree</td><td>ville, ville_code, nombre_jours, prix_jour, montant, devise</td><td>les boutons 4 j / 7 j / 10 j</td></tr>
+      <tr><td>clic_bouton</td><td>bouton_id, bouton_libelle, bouton_zone</td><td>le bouton Réserver</td></tr>
+      <tr><td>reservation_demandee</td><td>produit_id, ville, ville_code, pays, nombre_jours, prix_jour, montant, devise</td><td>le bouton Réserver</td></tr>
+    </table>
+    <p class="chapo" style="margin-top:1rem">Les identifiants des boutons sont prévisibles : <code>duree-LIS-4</code>, <code>reserver-KIX</code>. De quoi s'entraîner aux filtres sur <code>Click ID</code>.</p>
+  </section>
+
+</main>
+
+<button class="dock-bascule" id="dock-bascule" aria-expanded="false">Journal (<span id="compteur-mobile">0</span>)</button>
+
+<aside class="dock" id="dock" aria-label="Journal">
+  <div class="dock-tete">
+    <button data-panneau="flux" aria-selected="true">dataLayer</button>
+    <button data-panneau="balises" aria-selected="false">Balises (<span id="compteur-balises">0</span>)</button>
+  </div>
+  <div class="dock-outils">
+    <input type="search" id="filtre" placeholder="filtrer…" aria-label="Filtrer">
+    <label class="bascule"><input type="checkbox" id="masquer-gtm"> masquer gtm.*</label>
+    <button class="mini-lien" id="btn-copier">copier</button>
+    <button class="mini-lien" id="btn-effacer">effacer</button>
+  </div>
+  <div class="panneau" id="flux" data-actif="1"><p class="panneau-vide">En attente du premier push…</p></div>
+  <div class="panneau" id="balises"><p class="panneau-vide">Aucune balise déclenchée.<br><br>Créez une balise <b>HTML personnalisé</b> dans GTM :<br><code>&lt;script&gt;escaleTag('Nom', {ville: {{DL - ville}}});&lt;/script&gt;</code><br><br>Elle s'affichera ici avec les valeurs résolues.</p></div>
+</aside>
+
+<script src="escale.js"></script>
+</body>
+</html>
