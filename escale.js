@@ -4,6 +4,7 @@
 (function () {
   'use strict';
 
+  var VERSION = 'v3';
   var PAGE = document.body.dataset.page;
   var DEVISE = 'EUR';
   var CLE_JOURNAL = 'escale_journal';
@@ -366,7 +367,7 @@
   var lignes = [];
   function diag(t) { lignes.push(t); elDiag.innerHTML = lignes.join('<br>'); }
 
-  diag('<em>page_path : ' + location.pathname + '</em> · page_type : ' + PAGE +
+  diag('<em>escale.js ' + VERSION + '</em> · page_path : ' + location.pathname + ' · page_type : ' + PAGE +
        ' · <em>' + debutPage + ' événements repris des pages précédentes</em>');
   if (location.protocol === 'file:') {
     diag('<b>Page ouverte en file:// —</b> l\'aperçu Tag Assistant ne peut pas s\'y connecter.');
