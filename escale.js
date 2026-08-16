@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'v3';
+  var VERSION = 'v4';
   var PAGE = document.body.dataset.page;
   var DEVISE = 'EUR';
   var CLE_JOURNAL = 'escale_journal';
@@ -122,6 +122,7 @@
     } else if (e.classe === 'ga4') {
       badge('ga4', 'hit sortant');
     }
+    if (e.info) badge('conso', e.info);
     if (meta.children.length) div.appendChild(meta);
 
     var pre = document.createElement('pre');
@@ -223,10 +224,32 @@
     }
 
     var nomEvt = params.en || params.ev || params.t || 'hit';
+
+    // Lecture du signal de consentement transporté par le hit.
+    var gcs = params.gcs || '';
+    var lecture = '';
+    if (/^G1[01][01]$/.test(gcs)) {
+      lecture = 'ad_storage ' + (gcs.charAt(2) === '1' ? 'granted' : 'denied') +
+                ' · analytics_storage ' + (gcs.charAt(3) === '1' ? 'granted' : 'denied');
+    } else if (gcs) {
+      lecture = 'gcs ' + gcs;
+    }
+    var cookieGa = document.cookie.indexOf('_ga=') !== -1 ? 'présent' : 'absent';
+
     var e = {
       horo: heure(),
       nom: dest + ' · ' + nomEvt,
-      brut: { destination: dest, mesure_id: params.tid || params.id || '', evenement: nomEvt, parametres: params, url: url.split('?')[0] },
+      brut: {
+        destination: dest,
+        mesure_id: params.tid || params.id || '',
+        evenement: nomEvt,
+        consentement_gcs: gcs || '(absent)',
+        consentement_lu: lecture || '(non transmis)',
+        cookie_ga: cookieGa,
+        parametres: params,
+        url: url.split('?')[0]
+      },
+      info: lecture ? gcs + ' · ' + lecture : '',
       page: PAGE,
       classe: 'ga4'
     };

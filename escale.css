@@ -141,6 +141,7 @@ section:last-child{border-bottom:none}
 .tag.page{background:#12232F;color:#7E97A6;border-color:#22374A}
 .tag.ga4{background:#1A1638;color:#B0A6F5;border-color:#3B3170}
 .tag.trig{background:#052A26;color:#3BD9C4;border-color:#0A544C}
+.tag.conso{background:#2A1C10;color:#F5C06A;border-color:#4A3110}
 .entree pre{display:none;margin:.4rem 0 0;padding:.5rem;background:#081420;border:1px solid #1D3247;border-radius:3px;font-family:var(--mono);font-size:.7rem;line-height:1.45;color:#B6D8D2;white-space:pre-wrap;word-break:break-word;max-height:16rem;overflow:auto}
 .entree.ouvert pre{display:block}
 .panneau-vide{color:#67808F;font-size:.82rem;padding:1rem 0;line-height:1.6}
