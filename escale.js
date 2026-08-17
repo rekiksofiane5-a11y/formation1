@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'v4';
+  var VERSION = 'v6';
   var PAGE = document.body.dataset.page;
   var DEVISE = 'EUR';
   var CLE_JOURNAL = 'escale_journal';
@@ -73,6 +73,8 @@
 
   var memoireJournal = lire(CLE_JOURNAL);
   var memoireHits = lire(CLE_HITS);
+  var modele = {};          // état courant des variables de la page
+  var panneauModele = null; // construit plus bas, une fois le dock disponible
 
   /* ========== Rendu d'une entrée ========== */
   var flux = parId('flux');
@@ -180,6 +182,7 @@
     elCompteur.textContent = memoireJournal.length;
     elCompteurMobile.textContent = memoireJournal.length;
     afficher(flux, e, false);
+    majModele(msg);
     filtrer();
   };
 
@@ -308,6 +311,68 @@
   (window.__tagsEnAttente || []).forEach(function (a) { window.escaleTag(a[0], a[1]); });
   window.__tagsEnAttente = [];
 
+  /* ========== Modèle de données de la page courante ========== */
+  var ongletModele = document.createElement('button');
+  ongletModele.dataset.panneau = 'modele';
+  ongletModele.setAttribute('aria-selected', 'false');
+  ongletModele.innerHTML = 'Modèle (<span id="compteur-modele">0</span>)';
+  document.querySelector('.dock-tete').appendChild(ongletModele);
+
+  panneauModele = document.createElement('div');
+  panneauModele.className = 'panneau';
+  panneauModele.id = 'modele';
+  panneauModele.innerHTML = '<p class="panneau-vide">Aucune variable pour l\'instant.</p>';
+  parId('dock').appendChild(panneauModele);
+
+  dessinerModele();
+
+  function majModele(msg) {
+    if (!msg || typeof msg !== 'object') return;
+    if (typeof msg.length === 'number' && !Array.isArray(msg)) return; // gtag(...)
+    Object.keys(msg).forEach(function (k) {
+      if (k === 'event' || k.indexOf('gtm.') === 0) return;
+      modele[k] = msg[k];
+    });
+    dessinerModele();
+  }
+
+  function dessinerModele() {
+    if (!panneauModele) return; // interface pas encore construite
+    var cles = Object.keys(modele).sort();
+    parId('compteur-modele').textContent = cles.length;
+    if (!cles.length) {
+      panneauModele.innerHTML = '<p class="panneau-vide">Aucune variable pour l\'instant.</p>';
+      return;
+    }
+    panneauModele.innerHTML = '';
+    var intro = document.createElement('p');
+    intro.className = 'mod-intro';
+    intro.textContent = 'État courant du modèle de données. Chaque clé se récupère avec une variable de type Couche de données portant exactement ce nom.';
+    panneauModele.appendChild(intro);
+
+    cles.forEach(function (k) {
+      var v = modele[k];
+      var texte;
+      try { texte = typeof v === 'object' ? JSON.stringify(v) : String(v); }
+      catch (e) { texte = String(v); }
+
+      var l = document.createElement('div');
+      l.className = 'mod-ligne';
+      var c = document.createElement('div');
+      c.className = 'mod-cle';
+      c.textContent = k;
+      var val = document.createElement('div');
+      val.className = 'mod-val';
+      val.textContent = texte;
+      if (v === undefined || v === null || texte === '') val.classList.add('vide');
+      var g = document.createElement('div');
+      g.className = 'tag trig';
+      g.textContent = 'DL - ' + k;
+      l.appendChild(c); l.appendChild(val); l.appendChild(g);
+      panneauModele.appendChild(l);
+    });
+  }
+
   /* ========== Dock ========== */
   document.querySelectorAll('.dock-tete button').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -382,11 +447,110 @@
   parId('btn-tout-refuser').addEventListener('click', function () { tout('denied', 'bandeau-refuser'); });
   peindre();
 
+  /* ========== CMP de démonstration ========== */
+  var choixMarketing = 'denied';
+  var choixAnalytics = 'denied';
+
+  function construireCmp() {
+    var o = document.createElement('div');
+    o.className = 'cmp-fond';
+    o.id = 'cmp-fond';
+    o.setAttribute('role', 'dialog');
+    o.setAttribute('aria-modal', 'true');
+    o.setAttribute('aria-labelledby', 'cmp-titre');
+    o.innerHTML =
+      '<div class="cmp">' +
+        '<h2 id="cmp-titre">Vos préférences de confidentialité</h2>' +
+        '<p>Escale utilise des traceurs. Vous pouvez accepter ou refuser chaque finalité. ' +
+        'Ce bandeau est une démonstration : aucun traceur réel n\'est déposé.</p>' +
+        '<div class="cmp-ligne">' +
+          '<div><b>Mesure d\'audience</b><span>Analyser la navigation pour améliorer le site.</span>' +
+          '<em>analytics_storage</em></div>' +
+          '<div class="cmp-choix">' +
+            '<button id="cmp-ana-non" data-val="denied">Refuser</button>' +
+            '<button id="cmp-ana-oui" data-val="granted">Accepter</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cmp-ligne">' +
+          '<div><b>Publicité</b><span>Mesurer et personnaliser les campagnes.</span>' +
+          '<em>ad_storage · ad_user_data · ad_personalization</em></div>' +
+          '<div class="cmp-choix">' +
+            '<button id="cmp-mkt-non" data-val="denied">Refuser</button>' +
+            '<button id="cmp-mkt-oui" data-val="granted">Accepter</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cmp-pied">' +
+          '<button class="cmp-btn creux" id="cmp-refuser">Tout refuser</button>' +
+          '<button class="cmp-btn creux" id="cmp-enregistrer">Enregistrer mes choix</button>' +
+          '<button class="cmp-btn" id="cmp-accepter">Tout accepter</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(o);
+
+    function peindreCmp() {
+      parId('cmp-ana-oui').setAttribute('aria-pressed', String(choixAnalytics === 'granted'));
+      parId('cmp-ana-non').setAttribute('aria-pressed', String(choixAnalytics === 'denied'));
+      parId('cmp-mkt-oui').setAttribute('aria-pressed', String(choixMarketing === 'granted'));
+      parId('cmp-mkt-non').setAttribute('aria-pressed', String(choixMarketing === 'denied'));
+    }
+    ['cmp-ana-oui', 'cmp-ana-non'].forEach(function (id) {
+      parId(id).addEventListener('click', function () { choixAnalytics = this.dataset.val; peindreCmp(); });
+    });
+    ['cmp-mkt-oui', 'cmp-mkt-non'].forEach(function (id) {
+      parId(id).addEventListener('click', function () { choixMarketing = this.dataset.val; peindreCmp(); });
+    });
+
+    function valider(origine) {
+      appliquer({
+        analytics_storage: choixAnalytics,
+        ad_storage: choixMarketing,
+        ad_user_data: choixMarketing,
+        ad_personalization: choixMarketing
+      }, origine);
+      fermerCmp();
+    }
+    parId('cmp-refuser').addEventListener('click', function () {
+      choixAnalytics = 'denied'; choixMarketing = 'denied'; peindreCmp(); valider('cmp-tout-refuser');
+    });
+    parId('cmp-accepter').addEventListener('click', function () {
+      choixAnalytics = 'granted'; choixMarketing = 'granted'; peindreCmp(); valider('cmp-tout-accepter');
+    });
+    parId('cmp-enregistrer').addEventListener('click', function () { valider('cmp-enregistrer'); });
+
+    peindreCmp();
+  }
+
+  function ouvrirCmp() {
+    if (parId('cmp-fond')) return;
+    choixAnalytics = etatConsent.analytics_storage === 'granted' ? 'granted' : 'denied';
+    choixMarketing = etatConsent.ad_storage === 'granted' ? 'granted' : 'denied';
+    construireCmp();
+    dataLayer.push({ event: 'cmp_affichee', cmp_nom: 'Escale Demo CMP' });
+  }
+  function fermerCmp() {
+    var o = parId('cmp-fond');
+    if (o) o.remove();
+  }
+
+  // Bouton de réouverture, injecté dans le bandeau de consentement.
+  var relance = document.createElement('button');
+  relance.className = 'btn-fant';
+  relance.id = 'btn-rouvrir-cmp';
+  relance.textContent = 'Rouvrir la CMP';
+  relance.addEventListener('click', ouvrirCmp);
+  document.querySelector('.consent-inner').appendChild(relance);
+
+  // Affichage au premier chargement de la session, tant qu'aucun choix n'est enregistré.
+  var choixEnregistre = false;
+  try { choixEnregistre = !!sessionStorage.getItem(CLE_CONSENT); } catch (e) {}
+  if (!choixEnregistre) setTimeout(ouvrirCmp, 400);
+
   /* ========== Chargement du conteneur GTM ========== */
   var etatGtm = parId('etat-gtm');
   var champId = parId('id-conteneur');
   var elDiag = parId('diagnostic');
   var dejaCharge = false;
+  var idCharge = '';
   var lignes = [];
   function diag(t) { lignes.push(t); elDiag.innerHTML = lignes.join('<br>'); }
 
@@ -416,6 +580,7 @@
     id = trouve[0];
     champId.value = id;
     dejaCharge = true;
+    idCharge = id;
     propagerLiens(id);
     try { sessionStorage.setItem('escale_gtm', id); } catch (e) {}
 
@@ -448,8 +613,25 @@
     etatGtm.textContent = 'Chargement…';
   }
 
-  parId('btn-charger').addEventListener('click', function () { charger(champId.value); });
-  champId.addEventListener('keydown', function (e) { if (e.key === 'Enter') charger(champId.value); });
+  function demanderChargement() {
+    var saisi = String(champId.value).toUpperCase().match(/GTM-[A-Z0-9]+/);
+    if (!saisi) {
+      etatGtm.className = 'etat ko';
+      etatGtm.textContent = 'Format attendu : GTM-XXXXXXX';
+      return;
+    }
+    // Un conteneur ne peut pas être déchargé : on recharge la page avec le nouveau.
+    if (dejaCharge && saisi[0] !== idCharge) {
+      try { sessionStorage.setItem('escale_gtm', saisi[0]); } catch (e) {}
+      etatGtm.className = 'etat';
+      etatGtm.textContent = 'Bascule vers ' + saisi[0] + '…';
+      location.href = location.pathname + '?gtm=' + saisi[0];
+      return;
+    }
+    charger(champId.value);
+  }
+  parId('btn-charger').addEventListener('click', demanderChargement);
+  champId.addEventListener('keydown', function (e) { if (e.key === 'Enter') demanderChargement(); });
 
   var idMemorise = '';
   try { idMemorise = sessionStorage.getItem('escale_gtm') || ''; } catch (e) {}

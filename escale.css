@@ -160,3 +160,31 @@ section:last-child{border-bottom:none}
   .compteur{margin-left:0}
   .nav .chemin{margin-left:0;flex-basis:100%}
 }
+
+/* ---------- CMP de démonstration ---------- */
+.cmp-fond{position:fixed;inset:0;z-index:200;background:rgba(13,27,42,.55);display:flex;align-items:flex-end;justify-content:center;padding:1rem}
+.cmp{background:var(--carte);border:1px solid var(--trait);border-radius:6px;max-width:640px;width:100%;padding:1.4rem;box-shadow:0 -6px 30px rgba(0,0,0,.2)}
+.cmp h2{font-size:1.2rem;margin-bottom:.3rem}
+.cmp>p{font-size:.88rem;color:var(--gris);margin:0 0 1rem;max-width:58ch}
+.cmp-ligne{display:flex;gap:1rem;align-items:center;justify-content:space-between;padding:.75rem 0;border-top:1px solid var(--trait);flex-wrap:wrap}
+.cmp-ligne b{display:block;font-size:.95rem}
+.cmp-ligne span{display:block;font-size:.82rem;color:var(--gris)}
+.cmp-ligne em{display:block;font-family:var(--mono);font-size:.7rem;color:var(--signal-sombre);font-style:normal;margin-top:.15rem}
+.cmp-choix{display:flex;gap:.3rem;flex-shrink:0}
+.cmp-choix button{background:transparent;border:1px solid var(--trait);color:var(--gris);font-size:.8rem;font-weight:600;padding:.35rem .8rem}
+.cmp-choix button[aria-pressed="true"][data-val="granted"]{background:var(--signal);border-color:var(--signal);color:#03211E}
+.cmp-choix button[aria-pressed="true"][data-val="denied"]{background:var(--grenat);border-color:var(--grenat);color:#fff}
+.cmp-pied{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end;padding-top:1rem;border-top:1px solid var(--trait);margin-top:.5rem}
+.cmp-btn{background:var(--nuit);color:#fff;font-weight:600;font-size:.85rem;padding:.55rem 1rem}
+.cmp-btn.creux{background:transparent;color:var(--nuit);border:1px solid var(--trait)}
+.cmp-btn.creux:hover{border-color:var(--nuit)}
+@media (max-width:1040px){.cmp-fond{align-items:center}}
+
+/* ---------- modèle de données ---------- */
+.mod-intro{font-size:.75rem;color:#67808F;line-height:1.5;margin:0 0 .8rem}
+.mod-ligne{display:grid;grid-template-columns:1fr;gap:.15rem;padding:.45rem 0;border-bottom:1px solid #1D3247}
+.mod-ligne:last-child{border-bottom:none}
+.mod-cle{font-family:var(--mono);font-size:.78rem;font-weight:600;color:#fff;word-break:break-all}
+.mod-val{font-family:var(--mono);font-size:.72rem;color:#B6D8D2;word-break:break-word}
+.mod-val.vide{color:#F08099;font-style:italic}
+.mod-ligne .tag{justify-self:start;margin-top:.15rem}
