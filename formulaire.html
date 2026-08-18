@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escale — demande de devis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="escale.css?v=7">
+
+<!-- dataLayer + moniteur : AVANT tout le reste -->
+<script>
+window.dataLayer = window.dataLayer || [];
+window.__journal = [];
+window.__tampon = [];
+window.__journaliser = function (m) { window.__tampon.push(m); };
+window.escaleTag = function (n, d) { (window.__tagsEnAttente = window.__tagsEnAttente || []).push([n, d]); };
+
+(function () {
+  function installerHook() {
+    var dl = window.dataLayer;
+    if (!dl || (dl.push && dl.push.__hooke)) return;
+    var origine = dl.push;
+    var wrapper = function () {
+      for (var i = 0; i < arguments.length; i++) {
+        try { window.__journaliser(arguments[i]); } catch (e) {}
+      }
+      return origine.apply(dl, arguments);
+    };
+    wrapper.__hooke = true;
+    dl.push = wrapper;
+  }
+  window.__installerHook = installerHook;
+  installerHook();
+  setInterval(installerHook, 400);
+})();
+
+// Consent Mode v2 — restauré depuis la session, AVANT le chargement de GTM.
+function gtag() { dataLayer.push(arguments); }
+window.__consentInitial = { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' };
+try {
+  var sauvegarde = sessionStorage.getItem('escale_consent');
+  if (sauvegarde) window.__consentInitial = JSON.parse(sauvegarde);
+} catch (e) {}
+gtag('consent', 'default', {
+  ad_storage: window.__consentInitial.ad_storage,
+  ad_user_data: window.__consentInitial.ad_user_data,
+  ad_personalization: window.__consentInitial.ad_personalization,
+  analytics_storage: window.__consentInitial.analytics_storage,
+  functionality_storage: 'granted',
+  security_storage: 'granted',
+  wait_for_update: 500
+});
+
+dataLayer.push({
+  page_type: 'formulaire',
+  page_nom: 'Demande de devis',
+  environnement: 'formation',
+  langue: 'fr'
+});
+</script>
+</head>
+<body data-page="formulaire">
+
+<header class="barre">
+  <div class="barre-inner">
+    <div class="marque">escale<span>.</span></div>
+    <div class="champ">
+      <label for="id-conteneur">Conteneur</label>
+      <input type="text" id="id-conteneur" value="GTM-PGXXKF5F" placeholder="GTM-XXXXXXX" spellcheck="false" autocomplete="off">
+    </div>
+    <button class="btn" id="btn-charger">Charger</button>
+    <span class="etat" id="etat-gtm">en attente</span>
+    <div class="compteur"><b id="compteur">0</b> événements</div>
+    <p class="diag" id="diagnostic"></p>
+  </div>
+  <div class="consent">
+    <div class="consent-inner">
+      <span class="titre">Consent Mode v2</span>
+      <button class="pastille" data-consent="ad_storage" data-etat="denied">ad_storage : denied</button>
+      <button class="pastille" data-consent="ad_user_data" data-etat="denied">ad_user_data : denied</button>
+      <button class="pastille" data-consent="ad_personalization" data-etat="denied">ad_personalization : denied</button>
+      <button class="pastille" data-consent="analytics_storage" data-etat="denied">analytics_storage : denied</button>
+      <button class="btn-fant" id="btn-tout-accepter">Tout accepter</button>
+      <button class="btn-fant" id="btn-tout-refuser">Tout refuser</button>
+    </div>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html">Accueil</a>
+    <a href="destinations.html">Destinations</a>
+    <a href="formulaire.html" aria-current="page">Devis</a>
+    <a href="merci.html">Confirmation</a>
+    <span class="chemin">page_type <b>formulaire</b></span>
+  </div>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <span class="eyebrow">Demande de devis</span>
+    <h1>Parlez-nous<br>de votre projet.</h1>
+    <p class="chapo">Ce formulaire pousse un événement à l'ouverture du premier champ, un autre en cas d'erreur de saisie, et un dernier à l'envoi. Aucune donnée n'est transmise.</p>
+  </section>
+
+  <section id="devis">
+    <form id="form-devis" novalidate>
+      <div class="form-grille">
+        <div>
+          <label for="f-nom">Nom *</label>
+          <input type="text" id="f-nom" name="nom" autocomplete="name">
+        </div>
+        <div>
+          <label for="f-email">Adresse e-mail *</label>
+          <input type="email" id="f-email" name="email" autocomplete="email">
+        </div>
+        <div>
+          <label for="f-ville">Destination souhaitée</label>
+          <select id="f-ville" name="ville">
+            <option value="Lisbonne">Lisbonne</option>
+            <option value="Kyoto">Kyoto</option>
+            <option value="Marrakech">Marrakech</option>
+            <option value="Autre">Autre / à définir</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-personnes">Nombre de voyageurs</label>
+          <select id="f-personnes" name="personnes">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="4">3 à 5</option>
+            <option value="8">6 et plus</option>
+          </select>
+        </div>
+        <div>
+          <label for="f-budget">Budget par personne (€)</label>
+          <input type="text" id="f-budget" name="budget" placeholder="1200" inputmode="numeric">
+        </div>
+        <div>
+          <label for="f-canal">Être recontacté par</label>
+          <select id="f-canal" name="canal">
+            <option value="email">E-mail</option>
+            <option value="telephone">Téléphone</option>
+          </select>
+        </div>
+        <div class="pleine">
+          <label for="f-message">Votre projet</label>
+          <textarea id="f-message" name="message" rows="3" placeholder="Dates envisagées, type de séjour…"></textarea>
+        </div>
+        <div class="pleine">
+          <button class="btn-clair" type="submit" id="btn-envoyer" data-bouton-id="envoyer-devis" data-bouton-zone="formulaire">Envoyer ma demande</button>
+        </div>
+      </div>
+    </form>
+    <p class="msg" id="msg-form" hidden></p>
+  </section>
+
+  <section id="confirmation" hidden>
+    <span class="eyebrow">Demande enregistrée</span>
+    <h2>Merci, nous vous répondons sous 48 h.</h2>
+    <div class="recu">
+      <span class="recu-tampon">Reçu</span>
+      <dl>
+        <dt>Référence</dt><dd id="recu-ref">—</dd>
+        <dt>Destination</dt><dd id="recu-ville">—</dd>
+        <dt>Voyageurs</dt><dd id="recu-personnes">—</dd>
+      </dl>
+      <div class="total" id="recu-budget">—</div>
+    </div>
+    <div class="actions">
+      <button class="btn-bord" id="btn-nouvelle" data-bouton-id="nouvelle-demande" data-bouton-zone="confirmation">Envoyer une autre demande</button>
+      <a class="btn-clair" href="destinations.html" data-bouton-id="voir-destinations" data-bouton-zone="confirmation">Voir les destinations</a>
+    </div>
+  </section>
+
+  <section id="cles">
+    <span class="eyebrow">Aide-mémoire</span>
+    <h2>Ce que cette page pousse</h2>
+    <table class="cles">
+      <tr><th>Événement</th><th>Clés disponibles</th><th>Déclenché par</th></tr>
+      <tr><td>—</td><td>page_type, page_nom, environnement, langue</td><td>chargement de la page</td></tr>
+      <tr><td>form_start</td><td>form_id, form_name</td><td>premier champ activé, une seule fois</td></tr>
+      <tr><td>form_error</td><td>form_id, champ_en_erreur, message_erreur</td><td>envoi avec une saisie invalide</td></tr>
+      <tr><td>generate_lead</td><td>form_id, form_name, ville, nombre_personnes, budget, canal, valeur_estimee, devise, lead_id</td><td>envoi valide</td></tr>
+    </table>
+    <p class="chapo" style="margin-top:1rem">Le formulaire est un vrai <code>&lt;form&gt;</code> : le déclencheur natif <b>Envoi de formulaire</b> fonctionne aussi, en parallèle de <code>generate_lead</code>. Comparez les deux.</p>
+  </section>
+
+</main>
+
+<button class="dock-bascule" id="dock-bascule" aria-expanded="false">Journal (<span id="compteur-mobile">0</span>)</button>
+
+<aside class="dock" id="dock" aria-label="Journal">
+  <div class="dock-tete">
+    <button data-panneau="flux" aria-selected="true">dataLayer</button>
+    <button data-panneau="hits" aria-selected="false">Hits &amp; balises (<span id="compteur-hits">0</span>)</button>
+  </div>
+  <div class="dock-outils">
+    <input type="search" id="filtre" placeholder="filtrer…" aria-label="Filtrer">
+    <label class="bascule"><input type="checkbox" id="masquer-gtm"> masquer gtm.*</label>
+    <button class="mini-lien" id="btn-copier">copier</button>
+    <button class="mini-lien" id="btn-effacer">effacer</button>
+  </div>
+  <div class="panneau" id="flux" data-actif="1"><p class="panneau-vide">En attente du premier push…</p></div>
+  <div class="panneau" id="hits"><p class="panneau-vide">Aucun hit sortant pour l'instant.<br><br>Les événements GA4, Google Ads et Meta envoyés par vos balises s'afficheront ici automatiquement, avec leurs paramètres.<br><br>Une balise <b>HTML personnalisé</b> s'y affiche aussi, via <code>escaleTag('Nom')</code> ou <code>dataLayer.push({event:'escale_tag', balise_nom:'Nom'})</code>.</p></div>
+</aside>
+
+<script src="escale.js?v=7"></script>
+
+<!-- Logique propre à cette page. escale.js n'est pas modifié. -->
+<script>
+(function () {
+  'use strict';
+  var FORM_ID = 'form-devis';
+  var FORM_NOM = 'demande_devis';
+
+  function id(x) { return document.getElementById(x); }
+  function vers(x) { var el = id(x); if (el && el.scrollIntoView) el.scrollIntoView(); }
+  function dire(texte, erreur) {
+    var m = id('msg-form');
+    m.hidden = false;
+    m.className = erreur ? 'msg err' : 'msg';
+    m.textContent = texte;
+  }
+
+  // 1. form_start — au premier champ activé, une seule fois.
+  var demarre = false;
+  var form = id(FORM_ID);
+  form.addEventListener('focusin', function () {
+    if (demarre) return;
+    demarre = true;
+    dataLayer.push({ event: 'form_start', form_id: FORM_ID, form_name: FORM_NOM });
+  });
+
+  // 2. Envoi
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var nom = id('f-nom').value.trim();
+    var email = id('f-email').value.trim();
+    var budgetBrut = id('f-budget').value.replace(/[^0-9]/g, '');
+    var personnes = parseInt(id('f-personnes').value, 10) || 1;
+    var ville = id('f-ville').value;
+    var canal = id('f-canal').value;
+
+    if (!nom) {
+      dataLayer.push({ event: 'form_error', form_id: FORM_ID, champ_en_erreur: 'nom', message_erreur: 'Nom manquant' });
+      dire('Renseignez votre nom.', true);
+      id('f-nom').focus();
+      return;
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      dataLayer.push({ event: 'form_error', form_id: FORM_ID, champ_en_erreur: 'email', message_erreur: 'Adresse e-mail invalide' });
+      dire('Adresse e-mail invalide.', true);
+      id('f-email').focus();
+      return;
+    }
+
+    var budget = parseInt(budgetBrut, 10) || 0;
+    var valeur = budget * personnes;
+    var ref = 'DEV-' + Date.now().toString().slice(-6);
+
+    dataLayer.push({
+      event: 'generate_lead',
+      form_id: FORM_ID,
+      form_name: FORM_NOM,
+      lead_id: ref,
+      ville: ville,
+      nombre_personnes: personnes,
+      budget: budget,
+      canal: canal,
+      valeur_estimee: valeur,
+      devise: 'EUR'
+    });
+
+    id('recu-ref').textContent = ref;
+    id('recu-ville').textContent = ville;
+    id('recu-personnes').textContent = personnes;
+    id('recu-budget').textContent = valeur
+      ? valeur.toFixed(2).replace('.', ',') + ' €'
+      : 'Budget non renseigné';
+
+    id('devis').hidden = true;
+    id('confirmation').hidden = false;
+    vers('confirmation');
+  });
+
+  // 3. Retour au formulaire
+  id('btn-nouvelle').addEventListener('click', function () {
+    form.reset();
+    demarre = false;
+    id('msg-form').hidden = true;
+    id('confirmation').hidden = true;
+    id('devis').hidden = false;
+    vers('devis');
+  });
+})();
+</script>
+</body>
+</html>
